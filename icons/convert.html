@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Icon Converter</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas16" width="16" height="16"></canvas>
+    <canvas id="canvas48" width="48" height="48"></canvas>
+    <canvas id="canvas128" width="128" height="128"></canvas>
+    <script>
+        const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="20" fill="#2196F3"/>
+  <circle cx="64" cy="64" r="40" fill="white"/>
+  <path d="M64 30 L64 64 L94 64" stroke="#2196F3" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M64 98 L64 64 L34 64" stroke="#2196F3" stroke-width="8" fill="none" stroke-linecap="round"/>
+</svg>`;
+
+        function convertToPNG(canvasId, size) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            const svgBlob = new Blob([svg], {type: 'image/svg+xml;charset=utf-8'});
+            const url = URL.createObjectURL(svgBlob);
+
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, size, size);
+                const png = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = `icon${size}.png`;
+                link.href = png;
+                link.click();
+            };
+            img.src = url;
+        }
+
+        // Convert to different sizes
+        convertToPNG('canvas16', 16);
+        convertToPNG('canvas48', 48);
+        convertToPNG('canvas128', 128);
+    </script>
+</body>
+</html>
