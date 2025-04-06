@@ -19,22 +19,26 @@ function setupIdleDetection() {
       chrome.idle.setDetectionInterval(settings.idleTimeout);
       chrome.idle.onStateChanged.addListener((state) => {
         if (state === "idle") {
-          redirectToHomepage(settings.homepageUrl);
+          redirectCurrentTab(settings.homepageUrl);
         }
       });
     }
   });
 }
 
-// Redirect all tabs to homepage
-function redirectToHomepage(homepageUrl) {
-  chrome.tabs.query({}, (tabs) => {
-    tabs.forEach((tab) => {
+// Redirect only the current tab to homepage
+function redirectCurrentTab(homepageUrl) {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0]) {
+      const currentTab = tabs[0];
       // Skip chrome:// and edge:// URLs
-      if (!tab.url.startsWith("chrome://") && !tab.url.startsWith("edge://")) {
-        chrome.tabs.update(tab.id, { url: homepageUrl });
+      if (
+        !currentTab.url.startsWith("chrome://") &&
+        !currentTab.url.startsWith("edge://")
+      ) {
+        chrome.tabs.update(currentTab.id, { url: homepageUrl });
       }
-    });
+    }
   });
 }
 
