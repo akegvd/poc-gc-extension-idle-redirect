@@ -22,28 +22,37 @@
   <path d="M64 98 L64 64 L34 64" stroke="#2196F3" stroke-width="8" fill="none" stroke-linecap="round"/>
 </svg>`;
 
-        function convertToPNG(canvasId, size) {
+        const greySvg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="20" fill="#808080"/>
+  <circle cx="64" cy="64" r="40" fill="white"/>
+  <path d="M64 30 L64 64 L94 64" stroke="#808080" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M64 98 L64 64 L34 64" stroke="#808080" stroke-width="8" fill="none" stroke-linecap="round"/>
+</svg>`;
+
+        function convertToPNG(canvasId, size, isGrey = false) {
             const canvas = document.getElementById(canvasId);
             const ctx = canvas.getContext('2d');
             const img = new Image();
-            const svgBlob = new Blob([svg], {type: 'image/svg+xml;charset=utf-8'});
+            const svgBlob = new Blob([isGrey ? greySvg : svg], {type: 'image/svg+xml;charset=utf-8'});
             const url = URL.createObjectURL(svgBlob);
 
             img.onload = function() {
                 ctx.drawImage(img, 0, 0, size, size);
                 const png = canvas.toDataURL('image/png');
                 const link = document.createElement('a');
-                link.download = `icon${size}.png`;
+                link.download = `icon${size}${isGrey ? '_grey' : ''}.png`;
                 link.href = png;
                 link.click();
             };
             img.src = url;
         }
 
-        // Convert to different sizes
-        convertToPNG('canvas16', 16);
-        convertToPNG('canvas48', 48);
-        convertToPNG('canvas128', 128);
+        // Convert to different sizes for both colored and grey versions
+        [16, 48, 128].forEach(size => {
+            convertToPNG(`canvas${size}`, size, false); // Colored version
+            setTimeout(() => convertToPNG(`canvas${size}`, size, true), 500); // Grey version
+        });
     </script>
 </body>
 </html>
